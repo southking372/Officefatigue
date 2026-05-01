@@ -1,0 +1,98 @@
+{
+  "@context": {
+    "@vocab": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/"
+  },
+  "@type": "cr:Dataset",
+  "name": "OfficeFatigue",
+  "description": "A wrist-worn multimodal dataset for cognitive and physical fatigue sensing in office settings.",
+  "license": "https://creativecommons.org/licenses/by-nc/4.0/",
+  "url": "https://github.com/southking372/Officefatigue",
+  "version": "1.0.0",
+  "keywords": [
+    "fatigue detection",
+    "wearable sensors",
+    "PPG",
+    "IMU",
+    "time series classification",
+    "office health"
+  ],
+  "creator": {
+    "@type": "Organization",
+    "name": "Anonymous (NeurIPS 2026 submission)"
+  },
+  "datePublished": "2026",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "name": "OFL-sequences",
+      "description": "OfficeFatigue-Long preprocessed sequences",
+      "contentUrl": "data/OFL/sequences_1hz.npz",
+      "encodingFormat": "application/x-npz",
+      "sha256": "TBD"
+    },
+    {
+      "@type": "cr:FileObject", 
+      "name": "OFL-labels",
+      "description": "OfficeFatigue-Long labels and metadata",
+      "contentUrl": "data/OFL/analysis_units.csv",
+      "encodingFormat": "text/csv"
+    },
+    {
+      "@type": "cr:FileObject",
+      "name": "OFL-splits",
+      "description": "LOPO benchmark splits",
+      "contentUrl": "data/OFL/lopo_splits.json",
+      "encodingFormat": "application/json"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "name": "samples",
+      "description": "Individual analysis units with sensor data and labels",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "name": "unit_id",
+          "description": "Unique sample identifier",
+          "dataType": "sc:Text"
+        },
+        {
+          "@type": "cr:Field",
+          "name": "ppg",
+          "description": "PPG signal (1800 timesteps × 1 channel)",
+          "dataType": "cr:Float32"
+        },
+        {
+          "@type": "cr:Field",
+          "name": "imu",
+          "description": "IMU signal (1800 timesteps × 6 channels)",
+          "dataType": "cr:Float32"
+        },
+        {
+          "@type": "cr:Field",
+          "name": "cognitive_fatigue_label",
+          "description": "Cognitive fatigue level",
+          "dataType": "sc:Text",
+          "valueConstraint": {
+            "enum": ["low", "medium", "high"]
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "name": "physical_fatigue_label", 
+          "description": "Physical fatigue level",
+          "dataType": "sc:Text",
+          "valueConstraint": {
+            "enum": ["low", "medium", "high"]
+          }
+        }
+      ]
+    }
+  ],
+  "rai:dataBiases": "The dataset represents office workers from a specific demographic and cultural context. Fatigue patterns may differ across populations.",
+  "rai:dataLimitations": "Labels are derived from self-reported questionnaires, which may be subject to individual variation in fatigue perception.",
+  "rai:personalSensitiveInformation": "The dataset contains physiological signals (PPG, IMU) that could potentially be used for biometric identification. Direct identifiers have been removed."
+}
