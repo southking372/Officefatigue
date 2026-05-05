@@ -1,0 +1,246 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/schema/",
+    "rai": "http://mlcommons.org/croissant/RAI/"
+  },
+  "@type": "sc:Dataset",
+  "name": "OfficeFatigue",
+  "alternateName": "OfficeFatigue Signal and Benchmark Label Release",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "description": "OfficeFatigue is a wrist-worn multimodal dataset and benchmark for cognitive and physical fatigue sensing in office environments. The current public release combines participant-level processed PPG and 6-axis IMU signal arrays hosted on Hugging Face with per-participant cognitive and physical fatigue label CSV files and benchmark utilities hosted on GitHub.",
+  "url": "https://huggingface.co/datasets/lemonademelon/OfficeFatigue",
+  "sameAs": [
+    "https://github.com/southking372/Officefatigue"
+  ],
+  "codeRepository": "https://github.com/southking372/Officefatigue",
+  "license": "https://creativecommons.org/licenses/by-nc/4.0/",
+  "version": "1.0.0",
+  "datePublished": "2026",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Anonymous"
+    }
+  ],
+  "keywords": [
+    "wearable sensing",
+    "office fatigue",
+    "PPG",
+    "IMU",
+    "cognitive fatigue",
+    "physical fatigue",
+    "time-series classification",
+    "leave-one-participant-out",
+    "human-centered sensing"
+  ],
+  "isAccessibleForFree": true,
+  "isLiveDataset": false,
+  "measurementTechnique": [
+    "wrist-worn photoplethysmography",
+    "6-axis inertial measurement unit",
+    "self-report fatigue labels"
+  ],
+  "distribution": [
+    {
+      "@type": "sc:FileSet",
+      "@id": "hf_dataset_card",
+      "name": "hf_dataset_card",
+      "description": "Hugging Face dataset card for the OfficeFatigue signal release.",
+      "contentUrl": "https://huggingface.co/datasets/lemonademelon/OfficeFatigue",
+      "cr:includes": "README.md",
+      "encodingFormat": "text/markdown"
+    },
+    {
+      "@type": "sc:FileSet",
+      "@id": "hf_signal_files",
+      "name": "hf_signal_files",
+      "description": "Participant-level processed PPG and 6-axis IMU signal arrays hosted on Hugging Face.",
+      "contentUrl": "https://huggingface.co/datasets/lemonademelon/OfficeFatigue/tree/main",
+      "cr:includes": "**/*.npy",
+      "encodingFormat": "application/octet-stream"
+    },
+    {
+      "@type": "sc:FileSet",
+      "@id": "github_labels",
+      "name": "github_labels",
+      "description": "Per-participant OFS and OFL label CSV files hosted in the GitHub repository.",
+      "contentUrl": "https://github.com/southking372/Officefatigue/tree/main/labels",
+      "cr:includes": "**/*.csv",
+      "encodingFormat": "text/csv"
+    },
+    {
+      "@type": "sc:FileSet",
+      "@id": "github_code",
+      "name": "github_code",
+      "description": "Benchmark code, components, scripts, configuration files, and documentation hosted in the GitHub repository.",
+      "contentUrl": "https://github.com/southking372/Officefatigue",
+      "cr:includes": "**/*",
+      "encodingFormat": "text/plain"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "signal_arrays",
+      "name": "signal_arrays",
+      "description": "Participant-level processed signal arrays. The expected local layout is pXX/OFS_signal.npy and pXX/OFL_signal.npy. Each array is sampled at 125 Hz and has shape [samples, channels].",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "signal_arrays/participant_id",
+          "name": "participant_id",
+          "description": "Pseudonymous participant identifier from p01 to p25.",
+          "dataType": "sc:Text"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "signal_arrays/subset",
+          "name": "subset",
+          "description": "Dataset subset: OFS for controlled short-office sessions or OFL for naturalistic long-office routines.",
+          "dataType": "sc:Text"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "signal_arrays/sampling_rate_hz",
+          "name": "sampling_rate_hz",
+          "description": "Sampling rate of the PPG and IMU signals.",
+          "dataType": "sc:Integer"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "signal_arrays/ppg",
+          "name": "ppg",
+          "description": "Photoplethysmography signal channel.",
+          "dataType": "sc:Float"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "signal_arrays/accX",
+          "name": "acc_x",
+          "description": "Accelerometer x-axis channel.",
+          "dataType": "sc:Float"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "signal_arrays/accY",
+          "name": "acc_y",
+          "description": "Accelerometer y-axis channel.",
+          "dataType": "sc:Float"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "signal_arrays/accZ",
+          "name": "acc_z",
+          "description": "Accelerometer z-axis channel.",
+          "dataType": "sc:Float"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "signal_arrays/gyroX",
+          "name": "gyro_x",
+          "description": "Gyroscope x-axis channel.",
+          "dataType": "sc:Float"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "signal_arrays/gyroY",
+          "name": "gyro_y",
+          "description": "Gyroscope y-axis channel.",
+          "dataType": "sc:Float"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "signal_arrays/gyroZ",
+          "name": "gyro_z",
+          "description": "Gyroscope z-axis channel.",
+          "dataType": "sc:Float"
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "label_rows",
+      "name": "label_rows",
+      "description": "Per-participant label rows stored in GitHub CSV files. Each row is aligned to a contiguous 30-second signal segment in benchmark order. The current label CSV files contain only cognitive and physical fatigue labels.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "label_rows/participant_id",
+          "name": "participant_id",
+          "description": "Pseudonymous participant identifier inferred from the label filename.",
+          "dataType": "sc:Text"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "label_rows/subset",
+          "name": "subset",
+          "description": "OFS or OFL, inferred from the label filename.",
+          "dataType": "sc:Text"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "label_rows/row_index",
+          "name": "row_index",
+          "description": "Zero-based row index. Row order defines alignment to the local signal segment order.",
+          "dataType": "sc:Integer"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "label_rows/cognitive_fatigue_label",
+          "name": "cognitive_fatigue_label",
+          "description": "Ordinal cognitive fatigue label.",
+          "dataType": "sc:Text"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "label_rows/physical_fatigue_label",
+          "name": "physical_fatigue_label",
+          "description": "Ordinal physical fatigue label.",
+          "dataType": "sc:Text"
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "benchmark_outputs",
+      "name": "benchmark_outputs",
+      "description": "Output files written by the benchmark scripts: metrics_by_fold.csv, predictions_by_unit.csv, and summary.csv.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "benchmark_outputs/metrics_by_fold",
+          "name": "metrics_by_fold_csv",
+          "description": "Per-fold benchmark metrics under leave-one-participant-out evaluation.",
+          "dataType": "sc:Text"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "benchmark_outputs/predictions_by_unit",
+          "name": "predictions_by_unit_csv",
+          "description": "Predictions for each evaluated unit or segment.",
+          "dataType": "sc:Text"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "benchmark_outputs/summary",
+          "name": "summary_csv",
+          "description": "Aggregate benchmark summary metrics.",
+          "dataType": "sc:Text"
+        }
+      ]
+    }
+  ],
+  "rai:dataCollection": "Data were collected from human participants wearing a wrist-worn device during controlled office sessions and naturalistic office routines, with informed consent.",
+  "rai:dataUseCases": "The dataset is intended for research on wearable sensing, multimodal time-series learning, office fatigue modeling, and subject-independent evaluation.",
+  "rai:dataLimitations": "The current Hugging Face release provides participant-level processed signal arrays, while the GitHub repository provides label CSV files and benchmark utilities. Labels are subjective fatigue annotations rather than clinical measurements.",
+  "rai:dataBiases": "The participant pool, office routines, and sensor placement may not represent all populations, job roles, or workplace environments.",
+  "rai:dataReleaseMaintenancePlan": "Processed signals are hosted on Hugging Face. Labels, benchmark scripts, utilities, and documentation are maintained in the GitHub repository.",
+  "rai:prohibitedUses": "Employee surveillance, clinical diagnosis, safety-critical decision making, and attempts to re-identify participants are prohibited.",
+  "citation": "Anonymous. OfficeFatigue: A Naturalistic Multimodal Dataset for Cognitive and Physical Fatigue. NeurIPS Datasets and Benchmarks Track, 2026.",
+  "rai:personalSensitiveInformation": "The dataset contains human-subject wearable physiological and motion signals, including PPG and 6-axis IMU traces, as well as subjective fatigue and workload self-reports. Participant identifiers are pseudonymous and timestamps are session-relative, but physiological and motion patterns may still carry residual re-identification risk. The release therefore includes responsible-use restrictions and prohibits re-identification attempts.",
+  "rai:dataSocialImpact": "OfficeFatigue is intended to support research on wearable sensing, multimodal time-series learning, and office fatigue modeling. Potential positive impacts include reproducible benchmarks for human-centered sensing and better understanding of cognitive and physical fatigue during desk work. Potential negative impacts include misuse for workplace surveillance, inappropriate clinical interpretation, or safety-critical decisions; these uses are explicitly prohibited.",
+  "rai:hasSyntheticData": false
+}
