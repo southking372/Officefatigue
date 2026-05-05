@@ -1,144 +1,226 @@
-# OfficeFatigue
+# OfficeFatigue (NIPS2026DATASET Release)
 
-**OfficeFatigue** is a wrist-worn multimodal dataset and benchmark for cognitive and physical fatigue sensing in office settings.
+This repository contains the released label files and benchmark evaluation utilities for the 25-participant OfficeFatigue benchmark.
 
-## Overview
+The participant-level processed signal dataset is hosted on Hugging Face:
 
-OfficeFatigue provides synchronized PPG (photoplethysmography) and IMU (inertial measurement unit) signals from smartwatch-like wearable devices, along with validated fatigue labels covering both cognitive and physical dimensions. The dataset supports research in:
+- [lemonademelon/OfficeFatigue](https://huggingface.co/datasets/lemonademelon/OfficeFatigue)
 
-- Multimodal physiological sensing
-- Time-series classification
-- Fatigue detection and monitoring
-- Office well-being applications
+This release does not rebuild labels. It assumes you download the participant-level signal files from Hugging Face and evaluate them directly with the label CSV files stored here.
 
-## Dataset Contents
+## Included files
 
-| Component | Description |
-|-----------|-------------|
-| **PPG signals** | Preprocessed photoplethysmography at 1Hz |
-| **IMU signals** | 6-axis accelerometer + gyroscope at 1Hz |
-| **Cognitive fatigue labels** | Three-level: low / medium / high |
-| **Physical fatigue labels** | Three-level: low / medium / high |
-| **Self-report questionnaires** | MFI (4-20) and NASA-TLX (0-20) scores |
-| **Behavior context** | Activity labels: static / micro_move / shift |
-| **Benchmark splits** | Subject-independent LOPO evaluation |
+- `labels/OFL/p01_OFL_labels.csv` ... `p25_OFL_labels.csv`
+- `labels/OFS/p01_OFS_labels.csv` ... `p25_OFS_labels.csv`
+- `components/ml_model_utils.py`
+- `scripts/run_ml_benchmarks.py`
+- `scripts/run_minirocket.py`
+- `scripts/run_window_tsai_baselines.py`
+- `scripts/run_tsl_baselines.py`
+- `scripts/run_ts2vec_official.py`
 
-## Benchmark Subsets
+## Label file format
 
-| Subset | Description | Participants | Samples | Duration |
-|--------|-------------|:------------:|:-------:|:--------:|
-| **OFL** (OfficeFatigue-Long) | 30-minute analysis units | 6 | 91 | ~45 hours |
-| **OFS** (OfficeFatigue-Short) | 5-minute analysis units | - | - | Coming soon |
+Each per-participant label CSV contains exactly two columns:
 
-## Quick Start
+- `cognitive_fatigue_label`
+- `physical_fatigue_label`
 
-### Installation
+There are no extra metadata columns inside the per-participant label files.
+
+## How the labels correspond to the 25 participants
+
+For participant `pXX`:
+
+- `labels/OFL/pXX_OFL_labels.csv` corresponds to `pXX/OFL_signal.npy`
+- `labels/OFS/pXX_OFS_labels.csv` corresponds to `pXX/OFS_signal.npy`
+
+The correspondence rule is by row order:
+
+- row `0` in a participant label CSV corresponds to labeled unit `0`
+- row `1` corresponds to labeled unit `1`
+- and so on
+
+So if you segment the participant signal in benchmark order, labels are aligned row-by-row.
+
+## Expected local signal layout
+
+After downloading the Hugging Face dataset, your local signal directory should look like:
+
+```text
+OfficeFatigue/
+  p01/
+    OFL_signal.npy
+    OFS_signal.npy
+  p02/
+    OFL_signal.npy
+    OFS_signal.npy
+  ...
+  p25/
+    OFL_signal.npy
+    OFS_signal.npy
+```
+
+## Unit sizes
+
+- OFS: 84 label rows per participant
+- OFL: typically 678 to 858 label rows per participant
+
+The benchmark scripts assume 30-second windows at 125 Hz:
+
+- `3750` samples per labeled unit
+
+## Installation
+
+Run all commands below from the repository root. Create an environment and install the required packages:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Run Baseline Models
+## Machine-learning evaluation
+
+Example: run OFL machine-learning baselines
 
 ```bash
-# Deep learning baselines (CNN, TCN, InceptionTime, TimesNet, etc.)
-python baselines/run_deep_baselines.py \
-    --data-dir data/OFL \
-    --out results/deep_baselines.csv
-
-# Feature-based baselines (Random Forest, LightGBM)
-python baselines/run_feature_baselines.py \
-    --data-dir data/OFL \
-    --out results/feature_baselines.csv
+python scripts/run_ml_benchmarks.py \
+  --signal-root /path/to/OfficeFatigue \
+  --labels-dir labels/OFL \
+  --subset OFL \
+  --outdir results/ml_ofl
 ```
 
-## Benchmark Results
+Example: run OFS machine-learning baselines
 
-### OfficeFatigue-Long (OFL) - Macro-F1
-
-| Model | Cognitive Fatigue | Physical Fatigue |
-|-------|:-----------------:|:----------------:|
-| Random Forest | 0.503 ± 0.141 | 0.585 ± 0.176 |
-| LightGBM | 0.479 ± 0.179 | 0.506 ± 0.189 |
-| TCN | 0.570 ± 0.118 | 0.711 ± 0.163 |
-| TimesNet | 0.623 ± 0.121 | 0.614 ± 0.155 |
-| InceptionTime | 0.538 ± 0.167 | 0.563 ± 0.103 |
-
-*Evaluation: Leave-One-Participant-Out (LOPO) cross-validation*
-
-## Data Format
-
-### Sequence Data (`sequences_1hz.npz`)
-
-```python
-import numpy as np
-data = np.load('data/OFL/sequences_1hz.npz', allow_pickle=True)
-
-data['unit_id']  # Sample identifiers, shape: (N,)
-data['ppg']      # PPG signals, shape: (N, 1800, 1)
-data['imu']      # IMU signals, shape: (N, 1800, 6)
+```bash
+python scripts/run_ml_benchmarks.py \
+  --signal-root /path/to/OfficeFatigue \
+  --labels-dir labels/OFS \
+  --subset OFS \
+  --outdir results/ml_ofs
 ```
 
-### Labels (`analysis_units.csv`)
+Default ML models:
 
-| Column | Description |
-|--------|-------------|
-| `unit_id` | Unique sample identifier |
-| `participant_id` | Participant identifier |
-| `cognitive_fatigue_label` | low / medium / high |
-| `physical_fatigue_label` | low / medium / high |
-| `mfi_mental_raw` | MFI mental fatigue score (4-20) |
-| `mfi_physical_raw` | MFI physical fatigue score (4-20) |
-| `nasa_mental_demand` | NASA-TLX mental demand (0-20) |
-| `nasa_physical_demand` | NASA-TLX physical demand (0-20) |
-| `behavior_context` | static / micro_move / shift |
+- LR
+- SVM
+- LDA
+- KNN
+- DT
+- RF
+- GB
+- MLP
 
-### Benchmark Splits (`lopo_splits.json`)
+## Deep-learning evaluation
 
-```json
-{
-  "OFL": {
-    "test_P001": {
-      "train": ["OFL_P002_0000", ...],
-      "val": ["OFL_P006_0000", ...],
-      "test": ["OFL_P001_0000", ...]
-    },
-    ...
-  }
-}
+The repository now includes heavier benchmark wrappers that are closer to the paper-style model families than the earlier lightweight reference script.
+
+Included deep scripts:
+
+- `scripts/run_minirocket.py`
+  - MiniRocket via `sktime`
+- `scripts/run_window_tsai_baselines.py`
+  - `1D CNN`
+  - `TCN`
+  - `InceptionTime`
+  - `PatchTST`
+  - `Multimodal Ref.` (Attention-Fusion-style two-branch model)
+- `scripts/run_tsl_baselines.py`
+  - `Informer`
+  - `TimesNet`
+  - wraps the official THUML Time-Series-Library codebase
+- `scripts/run_ts2vec_official.py`
+  - TS2Vec representation learning + linear probe
+  - wraps an external TS2Vec repository
+
+These deep scripts are intentionally heavier. Some of them require external upstream repositories and prebuilt benchmark sequence files. They are included so that the model families are represented more faithfully, even if they are not the minimal one-command path.
+
+### Deep dependencies
+
+Install the base Python dependencies first:
+
+```bash
+pip install -r requirements.txt
 ```
 
-## Responsible Use
+For the heavier scripts, you may also need:
 
-This dataset is intended for **non-commercial research** on wearable sensing and office fatigue modeling. 
-
-**Prohibited uses:**
-- Employee surveillance or monitoring
-- Clinical diagnosis or medical decision-making
-- Safety-critical applications
-- Re-identification of participants
-
-## Citation
-
-```bibtex
-@inproceedings{officefatigue2026,
-  title={OfficeFatigue: A Multimodal Dataset for Cognitive and Physical Fatigue Sensing},
-  author={Anonymous},
-  booktitle={NeurIPS 2026 Datasets and Benchmarks Track},
-  year={2026}
-}
+```bash
+pip install tsai sktime
 ```
 
-## License
+For `Informer`, `TimesNet`, and `TS2Vec`, clone the corresponding upstream repositories locally and pass them through `--repo`.
 
-This dataset is released under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/).
+### Minimal direct deep evaluation
 
-## Files
+If you want a minimal local deep evaluation path based only on this repository plus the Hugging Face participant signals, use the machine-learning script above first. The heavier deep wrappers below are closer to the benchmark model families, but they expect prepared benchmark inputs such as:
 
-| File | Description | Status |
-|------|-------------|--------|
-| `data/OFL/` | OfficeFatigue-Long subset | Available |
-| `data/OFS/` | OfficeFatigue-Short subset | Coming soon |
-| `baselines/` | Baseline model implementations | Available |
-| `DATASHEET.md` | Dataset documentation | Available |
-| `croissant.json` | Croissant metadata | Available |
+- `analysis_units.csv`
+- `lopo_splits.json`
+- `windows_125hz.npz` or equivalent prepared sequence files
+
+### Example: MiniRocket
+
+```bash
+python scripts/run_minirocket.py \
+  --units /path/to/analysis_units.csv \
+  --splits /path/to/lopo_splits.json \
+  --sequences /path/to/windows_125hz.npz \
+  --split-key OFL \
+  --out results/minirocket_ofl.csv
+```
+
+### Example: tsai baselines
+
+```bash
+python scripts/run_window_tsai_baselines.py \
+  --units /path/to/analysis_units.csv \
+  --splits /path/to/lopo_splits.json \
+  --sequences /path/to/windows_125hz.npz \
+  --split-key OFL \
+  --out results/window_tsai_ofl.csv \
+  --epochs 30
+```
+
+### Example: Informer / TimesNet
+
+```bash
+python scripts/run_tsl_baselines.py \
+  --repo /path/to/Time-Series-Library \
+  --units /path/to/analysis_units.csv \
+  --splits /path/to/lopo_splits.json \
+  --sequences /path/to/windows_125hz.npz \
+  --split-key OFL \
+  --out results/tsl_ofl.csv
+```
+
+### Example: TS2Vec
+
+```bash
+python scripts/run_ts2vec_official.py \
+  --repo /path/to/ts2vec \
+  --units /path/to/analysis_units.csv \
+  --splits /path/to/lopo_splits.json \
+  --sequences /path/to/windows_125hz.npz \
+  --split-key OFL \
+  --out results/ts2vec_ofl.csv
+```
+
+## Outputs
+
+The direct ML script writes:
+
+- `metrics_by_fold.csv`
+- `predictions_by_unit.csv`
+- `summary.csv`
+
+The heavier deep wrappers write:
+
+- a per-fold metrics CSV
+- a summary CSV beside the requested output file
+
+## Notes
+
+- Each label row is matched to one contiguous 30-second signal segment in benchmark order.
+- `scripts/run_ml_benchmarks.py` performs participant-level leave-one-participant-out evaluation directly from the downloaded `.npy` files and the released label CSV files.
+- The heavier deep wrappers are included because they better match the intended model families, but they assume prepared benchmark tensors and, for some methods, external upstream repositories.
