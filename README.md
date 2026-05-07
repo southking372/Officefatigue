@@ -4,7 +4,7 @@ This repository contains the released label files and benchmark evaluation utili
 
 The participant-level processed signal dataset is hosted on Hugging Face:
 
-- [lemonademelon/OfficeFatigue](https://huggingface.co/datasets/lemonademelon/OfficeFatigue)
+- [OfficeFatigue](https://huggingface.co/datasets/Officefatigue/OfficeFatigue)
 
 This release does not rebuild labels. It assumes you download the participant-level signal files from Hugging Face and evaluate them directly with the label CSV files stored here.
 
